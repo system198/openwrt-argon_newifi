@@ -69,7 +69,10 @@ jobs:
         chmod +x $DIY_P1_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
-
+        
+    - name: Add luci-theme-argon (Newifi mod) to package
+      run: cd openwrt/package && git clone https://github.com/system198/luci-theme-argon.git
+      
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
@@ -105,7 +108,7 @@ jobs:
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 || make -j1 V=s
+        make package/luci-theme-argon/compile -j$(nproc) || make -j1 || make -j1 V=s
         echo "::set-output name=status::success"
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
